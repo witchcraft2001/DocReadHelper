@@ -1,0 +1,77 @@
+Public wcgNextTick As Variant
+Public wcgTimeRange1 As Variant
+Public wcgTimeRangeMinimum As Variant
+Public wcgBreak As Boolean
+Private Declare Sub Sleep Lib "kernel32" (ByVal dwMilliseconds As Long)
+
+Sub wcgGoNextWordInDocument()
+'Михальченков Дмитрий
+'22/12/15
+'Автоматическое позиционирование курсора на следующее слово
+'Application.Browser.Previous '::: В начало документа
+    wcgBreak = False
+    Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdWxtend
+    Selection.Expand Unit:=wdWord
+'Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdWxtend
+End Sub
+
+Sub wcgGoNextWordInDocumentStart()
+'Михальченков Дмитрий
+'22/12/15
+'Запуск периодического позиционирование курсора на следующее слово с повтором каждые N сек.
+    wcgTimeRangeMinimum = 0.000001
+    wcgTimeRange1 = wcgTimeRangeMinimum * 10
+    'wcgBreak = False
+    'MsgBox "start"
+    wcgGoNextWordInDocumentSchedule
+
+    'wcgGoNextWordNextTick = Now + TimeValue("00:00:02")
+    'Application.OnTime wcgGoNextWordNextTick, "wcgGoNextWordInDocumentSchedule"
+End Sub
+
+Function IS_EOD(ByRef MRange As Range) As Boolean
+
+If MRange.Bookmarks.Exists("\EndOfDoc") = True Then
+IS_EOD = True
+End If
+
+End Function
+
+Sub wcgGoNextWordInDocumentSchedule()
+'Михальченков Дмитрий
+'22/12/15
+'Автоматическое позиционирование курсора на следующее слово с повтором каждые N сек.
+    'wcgBreak = False
+    'wcgTimeRangeMinimum = 1
+    'wcgTimeRange1 = wcgTimeRangeMinimum * 10
+    'While wcgBreak = False And Not IS_EOD(Selection.Range)
+    '    Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdWxtend
+    '    Selection.Expand Unit:=wdWord
+    '    Sleep Selection.Characters.Count * wcgTimeRange1
+    'Wend
+
+
+    If wcgBreak = False Then
+        Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdWxtend
+        Selection.Expand Unit:=wdWord
+        'Selection.MoveRight Unit:=wdWord, Count:=1, Extend:=wdWxtend
+
+        If Not IS_EOD(Selection.Range) Then
+            nnn = Now
+            wcgNextTick = nnn + Selection.Characters.Count * wcgTimeRange1
+            Application.OnTime wcgNextTick, "wcgGoNextWordInDocumentSchedule"
+        End If
+    End If
+    If wcgBreak = True Or IS_EOD(Selection.Range) Then
+        MsgBox "Stop"
+    End If
+    'wcgBreak = False
+
+End Sub
+
+Sub wcgGoNextWordInDocumentStop()
+    'On Error Resume Next
+    'MsgBox "Stop"
+    wcgBreak = True
+    'Application.OnTime wcgGoNextWordNextTick, "wcgGoNextWordInDocumentSchedule", False
+End Sub
