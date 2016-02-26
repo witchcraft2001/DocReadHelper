@@ -16,7 +16,7 @@ namespace DocReadHelper
         static Word.Document oDoc = null;
         static int wLenght = 1;
         static int wSpeed = 100;
-        System.Windows.Forms.Timer timer = null;
+        static System.Windows.Forms.Timer timer = null;
 
         public frmMain()
         {
@@ -161,7 +161,7 @@ namespace DocReadHelper
             if (timer == null)
             {
                 timer = new Timer();
-                timer.Interval = 50;
+                timer.Interval = 100;
                 timer.Tick += NextWord;
                 timer.Start();
                 //timer = new System.Timers.Timer(100);
@@ -179,13 +179,16 @@ namespace DocReadHelper
         {
             if (oDoc != null)
             {
-                if (--wLenght == 0)
-                {
+                timer.Stop();
+                //if (--wLenght == 0)
+                //{
                     oWord.Selection.MoveRight(Word.WdUnits.wdWord, 1);
                     oWord.Selection.Expand(Word.WdUnits.wdWord);
-                    wLenght = (1200 / (wSpeed * 5)) * oWord.Selection.Characters.Count;
-                    if (wLenght == 0) wLenght = 1;
-                }
+                    wLenght = ((3500 / (wSpeed * 6)) * (oWord.Selection.Characters.Count > 1 ? oWord.Selection.Characters.Count : 1)) * 20;
+                    timer.Interval = wLenght;
+                    timer.Start();
+                    //if (wLenght == 0) wLenght = 1;
+                //}
             }
         }
 
