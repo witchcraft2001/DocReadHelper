@@ -16,7 +16,7 @@ namespace DocReadHelper
         static Word.Document oDoc = null;
         static int wLenght = 1;
         static int wSpeed = 100;
-        System.Windows.Forms.Timer timer = null;
+        static System.Windows.Forms.Timer timer = null;
 
         public frmMain()
         {
@@ -47,7 +47,6 @@ namespace DocReadHelper
                         if (oDoc != null)
                         {
                             ((Word._Document)oDoc).Close();
-                            //oDoc.Close();
                         }
                         oDoc = oWord.Documents.Open(textDocumentFile.Text);
 
@@ -60,8 +59,6 @@ namespace DocReadHelper
                         oWord.Visible = true;
                         btnStart.Enabled = true;
                         btnToHome.Enabled = true;                        
-
-//                        btnOpenDoc.Enabled = false;
                         btnOpenFile.Enabled = false;
                     }
                     catch (Exception exc)
@@ -82,28 +79,6 @@ namespace DocReadHelper
         {
             timerWatchDoc.Enabled = false;
             if (timer != null) btnStop_Click(sender, e);
-            /*
-            if (oDoc != null)
-            {
-                try
-                {
-                    ((Word._Document)oDoc).Close();
-                }
-                catch { }
-            }*/
-             /*
-            else
-            {
-                MessageBox.Show("Document is closed");
-            }*/
-            /*if (oWord != null)
-            {
-                try
-                {
-                    ((Word._Application)oWord).Quit();
-                }
-                catch { }
-            }*/
         }
 
         private void btnOpenDoc_Click(object sender, EventArgs e)
@@ -122,13 +97,11 @@ namespace DocReadHelper
             if (oDoc == null)
             {
                 btnOpenFile.Enabled = true;
-//                btnOpenDoc.Enabled = true;
             }
             if (oWord == null)
             {
                 oDoc = null;
                 btnOpenFile.Enabled = true;
-//                btnOpenDoc.Enabled = true;
             }
             if (oDoc == null || oWord == null)
             {
@@ -146,7 +119,6 @@ namespace DocReadHelper
             {
                 Word.Range rng = oDoc.Range(0, 0);
                 rng.Select();
-                //oWord.Selection.MoveStart();
             }
         }
 
@@ -161,31 +133,27 @@ namespace DocReadHelper
             if (timer == null)
             {
                 timer = new Timer();
-                timer.Interval = 50;
+                timer.Interval = 100;
                 timer.Tick += NextWord;
                 timer.Start();
-                //timer = new System.Timers.Timer(100);
-                //timer.Elapsed += NextWord;
             }
             btnSpeedDown.Enabled = true;
             btnSpeedUp.Enabled = true;
             btnStop.Enabled = true;
             btnStart.Enabled = false;
             this.Opacity = 50;
-            //NextWord();
         }
 
         private static void NextWord(Object myObject, EventArgs e)
         {
             if (oDoc != null)
             {
-                if (--wLenght == 0)
-                {
+                timer.Stop();
                     oWord.Selection.MoveRight(Word.WdUnits.wdWord, 1);
                     oWord.Selection.Expand(Word.WdUnits.wdWord);
-                    wLenght = (1200 / (wSpeed * 5)) * oWord.Selection.Characters.Count;
-                    if (wLenght == 0) wLenght = 1;
-                }
+                    wLenght = ((3500 / (wSpeed * 6)) * (oWord.Selection.Characters.Count > 1 ? oWord.Selection.Characters.Count : 1)) * 20;
+                    timer.Interval = wLenght;
+                    timer.Start();
             }
         }
 
@@ -241,26 +209,11 @@ namespace DocReadHelper
              * and the fourth number is half of the amount of total seconds in the day.
              * So if you compile at midnight it should be zero.
              */
-            //string version = AssemblyVersion;
             DateTime date = new DateTime(2000, 1, 1);
-            bool check = false;
             string[] verinfo = AssemblyVersion.Split('.');
-            try
-            {
-                //int days = Convert.ToInt32(verinfo[2]);
-                date = date.AddDays(Convert.ToInt32(verinfo[2]));
-                date = date.AddSeconds(Convert.ToInt32(verinfo[3]) * 2);
-                check = true;
-            }
-            catch { }
-            if (check)
-            {
-                MessageBox.Show(string.Format("Document Reading Helper ver.{0}.{1}\r\nВремя сборки: {2}\r\n\r\nРазработчик:\r\n\tМихальченков Дмитрий\r\n\tmikhaltchenkov@gmail.com", verinfo[0], verinfo[1], date), "О программе...", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
-            else
-            {
-                MessageBox.Show(string.Format("Document Reading Helper ver.{0}\r\n\r\nРазработчик:\r\n\tМихальченков Дмитрий\r\n\tmikhaltchenkov@gmail.com", AssemblyVersion), "О программе...", MessageBoxButtons.OK, MessageBoxIcon.Information);
-            }
+            date = date.AddDays(Convert.ToInt32(verinfo[2]));
+            date = date.AddSeconds(Convert.ToInt32(verinfo[3]) * 2);
+            MessageBox.Show(string.Format("Document Reading Helper ver.{0}.{1}\r\nВремя сборки: {2}\r\n\r\nРазработчик:\r\n\tМихальченков Дмитрий\r\n\tmikhaltchenkov@gmail.com", verinfo[0], verinfo[1], date), "О программе...", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
 
         public string AssemblyVersion

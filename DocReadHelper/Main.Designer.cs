@@ -79,7 +79,7 @@
             // 
             this.textSpeed.Location = new System.Drawing.Point(113, 42);
             this.textSpeed.Maximum = new decimal(new int[] {
-            250,
+            500,
             0,
             0,
             0});
@@ -92,7 +92,7 @@
             this.textSpeed.Size = new System.Drawing.Size(60, 20);
             this.textSpeed.TabIndex = 3;
             this.textSpeed.Value = new decimal(new int[] {
-            120,
+            180,
             0,
             0,
             0});
